@@ -2,7 +2,7 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import styled from 'styled-components';
 
-import bg from '~/assets/images/school.jpg'
+import bg from '~/assets/images/school.jpeg'
 import Tabs from '~/components/Tabs';
 import { Bell, Home, Menu, MessageCircle, Users } from 'lucide-react';
 import Sidebar from '../Sidebar';
@@ -92,5 +92,5 @@ const Welcome = styled.h1`
   text-align: center;
   font-size: 3rem;
   font-weight: 600;
-  color: white;
+  color: #f7f5f3;
 `
