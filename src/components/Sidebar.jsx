@@ -37,7 +37,7 @@ function Sidebar() {
       </Row>
       <ListContainer>
         <ListItem>{fakeEmail}</ListItem>
-        <ListItem>{fakeName}</ListItem>
+        <ListItem >{fakeName}</ListItem>
       </ListContainer>
        <pre>
          {JSON.stringify(annonces, null, 2)}
