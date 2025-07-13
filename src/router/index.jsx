@@ -11,39 +11,36 @@ import Welcome from '~/pages/Welcome'
 import ProtectedRoute from '~/components/auth/ProtectedRoute'
 
 const router = createBrowserRouter([
-  {
-    path: '/sign-in',
-    element: <SignIn />
-  },
-  {
-    path: '/sign-up',
-    element: <SignUp />
-  },
-  {
-    path: '/welcome',
-    element: <Welcome />
-  },
-  {
-    path: '/',
-    element: <ProtectedRoute />,
-    children: [
-      {
-        path: '',
-        element: <Layout />,
+    {
+        path: '/sign-in',
+        element: <SignIn />
+    },
+    {
+        path: '/sign-up',
+        element: <SignUp />
+    },
+    {
+        path: '/',
+        element: <ProtectedRoute />,
         children: [
-          { path: '', element: <Home /> },
-          { path: 'invitations', element: <Invitation /> },
-          { path: 'messages', element: <Message /> },
-          { path: 'notifications', element: <Notification /> },
-          { path: 'settings', element: <Settings /> }
+            {
+                path: '',
+                element: <Layout />,
+                children: [
+                    { path: '', element: <Welcome /> },
+                    { path: 'home', element: <Home /> },
+                    { path: 'invitations', element: <Invitation /> },
+                    { path: 'messages', element: <Message /> },
+                    { path: 'notifications', element: <Notification /> },
+                    { path: 'settings', element: <Settings /> }
+                ]
+            }
         ]
-      }
-    ]
-  },
-  {
-    path: '*',
-    element: <Navigate to='/welcome' replace />
-  }
+    },
+    {
+        path: '/*',
+        element: <Navigate to='/sign-in' replace />
+    }
 ])
 
 export default router

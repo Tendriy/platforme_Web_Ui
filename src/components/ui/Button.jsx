@@ -16,7 +16,7 @@ const StyledButton = styled.button`
   color: ${({ $color }) => $color || '#fff'};
   border: ${({ $border }) => $border || 'none'};
   cursor: pointer;
-  border-radius: ${({ $borderRadius }) => $borderRadius || '17px'};
+  border-radius: ${({ $borderRadius }) => $borderRadius || '0'};
 
   outline: ${({ $outline }) => $outline || 'none'};
 

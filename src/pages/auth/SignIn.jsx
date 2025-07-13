@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import styled from 'styled-components';
@@ -8,12 +8,49 @@ import Input from '~/components/ui/Input';
 
 import { Wrapper } from '~/styles/style';
 
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import axiosClient from '~/config/axiosClient';
+import useAuth from '~/hooks/useAuth';
+import { exec } from '~/utils/exec';
+
+
+const signInSchema = z.object({
+  email: z.email({ message: 'Email invalide' }),
+  password: z.string().min(6, { message: 'Mot de passe trop court (6 caractères minimum)' }),
+});
+
 function SignIn() {
   const navigate = useNavigate();
+  const login = useAuth(state => state.login)
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const submitEmail = () => {
-    navigate('/sign-in');
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: zodResolver(signInSchema),
+  });
+
+  const onSubmit = async (data) => {
+    const res = await exec(
+      () => axiosClient.post('/auth/sign-in', {
+        email: data.email,
+        motDePasse: data.password,
+      }),
+      setLoading,
+      setError
+    );
+    if (res) {
+      const { accessToken, refreshToken, user } = res.data;
+      login({ accessToken, refreshToken }, user);
+      navigate('/');
+    }
   };
+
 
   return (
     <Wrapper>
@@ -22,47 +59,47 @@ function SignIn() {
           Bienvenue sur <Highlight>Plateforme</Highlight>
         </Title>
 
-        <Para>
-          Connectez-vous pour accéder à votre compte
-        </Para>
+        <Para>Connectez-vous pour accéder à votre compte</Para>
 
-        <Form>
+        <Form onSubmit={handleSubmit(onSubmit)}>
           <Input
             type="email"
             id="email"
             placeholder="Adresse e-mail"
+            $borderRadius="6px"
+            {...register('email')}
           />
+          {errors.email && <ErrorText>{errors.email.message}</ErrorText>}
 
           <Input
             type="password"
             id="password"
             placeholder="Mot de passe"
+            $borderRadius="6px"
+            {...register('password')}
           />
+          {errors.password && <ErrorText>{errors.password.message}</ErrorText>}
 
-          <Button onClick={submitEmail}>
-            Se connecter
+          <Button type="submit" $borderRadius="6px" disabled={isSubmitting || loading}>
+            {loading ? 'Chargement...' : 'Se connecter'}
           </Button>
+
+          {error && <ErrorText>{error.message || 'Une erreur est survenue'}</ErrorText>}
         </Form>
 
         <Divider>ou</Divider>
 
-        <Button>
-          Continuer avec Google
-        </Button>
+        <Button $borderRadius="6px">Continuer avec Google</Button>
 
         <HaveAccount>
-          <StyledLink to="/sign-in">
-            Vous avez déjà un compte ?
-          </StyledLink>
-
-          <ForgotPasswordLink to="/forgot-password">
-            Mot de passe oublié ?
-          </ForgotPasswordLink>
+          <StyledLink to="/sign-up">Vous avez déjà un compte ?</StyledLink>
+          <ForgotPasswordLink to="/forgot-password">Mot de passe oublié ?</ForgotPasswordLink>
         </HaveAccount>
       </Container>
     </Wrapper>
   );
 }
+
 
 
 const Container = styled.div`
@@ -82,6 +119,8 @@ const Title = styled.h1`
   margin-bottom: 12px;
 `;
 
+
+
 const Highlight = styled.span`
   color: #007bff;
 `;
@@ -95,8 +134,14 @@ const Para = styled.p`
 const Form = styled.form`
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
   align-items: center;
+`;
+
+const ErrorText = styled.span`
+  color: #d32f2f;
+  font-size: 13px;
+  margin-left: 10px;
 `;
 
 const StyledLink = styled(Link)`
@@ -119,7 +164,6 @@ const ForgotPasswordLink = styled(Link)`
   }
 `;
 
-
 const Divider = styled.div`
   margin: 24px 0;
   font-size: 14px;
@@ -133,10 +177,9 @@ const HaveAccount = styled.p`
   font-size: 14px;
   color: #444;
   display: flex;
-  flex-direction: column; 
+  flex-direction: column;
   align-items: center;
-  gap: 6px; 
+  gap: 6px;
 `;
-
 
 export default SignIn;

@@ -13,7 +13,7 @@ const StyledInput = styled.input`
   font-size: ${({ $fontSize }) => $fontSize || '14px'};
   color: ${({ $color }) => $color || 'inherit'};
   border: ${({ $border }) => $border || '1px solid #ccc'};
-  border-radius: ${({ $borderRadius }) => $borderRadius || '6px'};
+  border-radius: ${({ $borderRadius }) => $borderRadius || '0'};
   outline: ${({ $outline }) => $outline || 'none'};
 
   &:focus {
