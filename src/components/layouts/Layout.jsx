@@ -10,7 +10,7 @@ import Sidebar from '../Sidebar';
 
 function Layout() {
   const tabs = [
-    { icon: Home, text: 'Home', to: '/' },
+    { icon: Home, text: 'Home', to: '/home' },
     { icon: Users, text: 'Invitation', to: '/invitations' },
     { icon: MessageCircle, text: 'Messages', to: '/messages' },
     { icon: Bell, text: 'Notification', to: '/notifications' },

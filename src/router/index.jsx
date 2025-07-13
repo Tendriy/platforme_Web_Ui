@@ -2,7 +2,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom'
 import Layout from '~/components/layouts/Layout'
 import SignIn from '~/pages/auth/SignIn'
 import SignUp from '~/pages/auth/SignUp'
-import ForgetPasword from '~/pages/auth/ForgetPasword'
+import ForgetPassword from '~/pages/auth/ForgetPassword'
 import Home from '~/pages/Home'
 import Invitation from '~/pages/Invitation'
 import Message from '~/pages/Message'
@@ -25,9 +25,9 @@ const router = createBrowserRouter([
         path: '/auth/google/redirect',
         element: <AuthGoogleRedirect />
     },
-     {
+    {
         path: '/forgot-password',
-        element: <ForgetPasword />
+        element: <ForgetPassword />
     },
     {
         path: '/',
@@ -35,9 +35,13 @@ const router = createBrowserRouter([
         children: [
             {
                 path: '',
+                element: <Welcome />
+            },
+            {
+
+                path: '',
                 element: <Layout />,
                 children: [
-                    { path: '', element: <Welcome /> },
                     { path: 'home', element: <Home /> },
                     { path: 'invitations', element: <Invitation /> },
                     { path: 'messages', element: <Message /> },

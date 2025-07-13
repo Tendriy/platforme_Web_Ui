@@ -54,7 +54,7 @@ function SignIn() {
         });
         const user = profileRes.data;
         login({ accessToken, refreshToken }, user);
-        navigate('/');
+        navigate('/home');
       } catch (profileError) {
         setError({ message: 'Impossible de récupérer le profil utilisateur' });
       }

@@ -1,5 +1,5 @@
 import React from 'react';
-import '~/assets/styles/NotificationPage.css';
+import styled from 'styled-components';
 import profile from '../assets/images/me.jpeg';
 
 const notifications = [
@@ -29,27 +29,78 @@ const notifications = [
   }
 ];
 
-const Notification = () => {
+function Notification() {
   return (
-    <div className="notification-container">
-      <h2 className="notification-title">Notifications</h2>
-      <ul className="notification-list">
+    <Container>
+      <Title>Notifications</Title>
+      <List>
         {notifications.map((notif) => (
-          <li key={notif.id} className="notification-item">
-            <img src={notif.image} alt="profil" className="notification-avatar" />
-            <div className="notification-content">
+          <Item key={notif.id}>
+            <Avatar src={notif.image} alt="profil" />
+            <Content>
               <p>
                 <strong>{notif.premon} {notif.nom}</strong> {notif.contenu}
               </p>
-              <span className="notification-date">
-                {new Date(notif.date).toLocaleString()}
-              </span>
-            </div>
-          </li>
+              <DateText>{new Date(notif.date).toLocaleString()}</DateText>
+            </Content>
+          </Item>
         ))}
-      </ul>
-    </div>
+      </List>
+    </Container>
   );
 };
 
 export default Notification;
+
+const Container = styled.div`
+  max-width: 700px;
+  margin: 2rem auto;
+  padding: 1rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+`;
+
+const Title = styled.h2`
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 0.5rem;
+`;
+
+const List = styled.ul`
+  list-style: none;
+  padding: 0;
+`;
+
+const Item = styled.li`
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid #f0f0f0;
+`;
+
+const Avatar = styled.img`
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+`;
+
+const Content = styled.div`
+  flex: 1;
+
+  p {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+`;
+
+const DateText = styled.span`
+  font-size: 0.85rem;
+  color: #888;
+`;
