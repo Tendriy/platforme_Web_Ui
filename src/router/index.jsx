@@ -11,6 +11,7 @@ import Settings from '~/pages/Settings'
 import Welcome from '~/pages/Welcome'
 import ProtectedRoute from '~/components/auth/ProtectedRoute'
 import AuthGoogleRedirect from '~/pages/auth/AuthGoogleRedirect'
+import ChangeImage from '~/pages/ChangeImage'
 
 const router = createBrowserRouter([
     {
@@ -43,6 +44,7 @@ const router = createBrowserRouter([
                 element: <Layout />,
                 children: [
                     { path: 'home', element: <Home /> },
+                    { path: 'change-image', element: <ChangeImage /> },
                     { path: 'invitations', element: <Invitation /> },
                     { path: 'messages', element: <Message /> },
                     { path: 'notifications', element: <Notification /> },
