@@ -45,12 +45,26 @@ function SignIn() {
       setError
     );
     if (res) {
-      const { accessToken, refreshToken, user } = res.data;
-      login({ accessToken, refreshToken }, user);
-      navigate('/');
+      const { accessToken, refreshToken } = res.data;
+      try {
+        const profileRes = await axiosClient.get('/auth/profile', {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        const user = profileRes.data;
+        login({ accessToken, refreshToken }, user);
+        navigate('/');
+      } catch (profileError) {
+        setError({ message: 'Impossible de récupérer le profil utilisateur' });
+      }
     }
   };
 
+
+  const handleGoogleSignIn = () => {
+    window.location.href = `${import.meta.env.VITE_BACKEND_URL}/auth/google`;
+  };
 
   return (
     <Wrapper>
@@ -89,7 +103,11 @@ function SignIn() {
 
         <Divider>ou</Divider>
 
-        <Button $borderRadius="6px">Continuer avec Google</Button>
+        <Button type="button"
+          onClick={handleGoogleSignIn}
+          $borderRadius="6px">
+          Continuer avec Google
+        </Button>
 
         <HaveAccount>
           <StyledLink to="/sign-up">Vous avez déjà un compte ?</StyledLink>

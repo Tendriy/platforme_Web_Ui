@@ -9,6 +9,7 @@ import Notification from '~/pages/Notification'
 import Settings from '~/pages/Settings'
 import Welcome from '~/pages/Welcome'
 import ProtectedRoute from '~/components/auth/ProtectedRoute'
+import AuthGoogleRedirect from '~/pages/auth/AuthGoogleRedirect'
 
 const router = createBrowserRouter([
     {
@@ -18,6 +19,10 @@ const router = createBrowserRouter([
     {
         path: '/sign-up',
         element: <SignUp />
+    },
+    {
+        path: '/auth/google/redirect',
+        element: <AuthGoogleRedirect />
     },
     {
         path: '/',
