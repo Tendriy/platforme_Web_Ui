@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import styled from 'styled-components';
+import '~/assets/styles/HomePage.css';
+
 
 const allAnnonces = [
   {
@@ -51,148 +52,58 @@ function Home() {
   }, []);
 
   return (
-    <PageContainer>
-      <PageTitle>Fil d'actualité</PageTitle>
+    <div className="page-container">
+      <h1 className="page-title">Fil d'actualité</h1>
 
       {annonces.map((annonce) => (
-        <Card key={annonce.id}>
-          <FlexRow>
-            <ProfileImg
+        <div key={annonce.id} className="card">
+          <div className="flex-row">
+            <img
               src={annonce.etudiant_image || '/default.jpg'}
               alt="profil"
+              className="profile-img"
             />
             <div>
-              <StudentName>{annonce.premon} {annonce.nom}</StudentName>
-              <StudentDate>{new Date(annonce.date_de_publication).toLocaleString()}</StudentDate>
+              <p className="student-name">{annonce.premon} {annonce.nom}</p>
+              <p className="student-date">{new Date(annonce.date_de_publication).toLocaleString()}</p>
             </div>
-          </FlexRow>
+          </div>
 
-          <AnnonceTitle>{annonce.titre}</AnnonceTitle>
-          <AnnonceContent>{annonce.contenu}</AnnonceContent>
+          <h2 className="annonce-title">{annonce.titre}</h2>
+          <p className="annonce-content">{annonce.contenu}</p>
 
           {annonce.image && (
-            <AnnonceImage src={annonce.image} alt="annonce" />
+            <img
+              src={annonce.image}
+              alt="annonce"
+              className="annonce-image"
+            />
           )}
 
-          <CommentsSection>
+          <div className="comments-section">
             <h3>Commentaires</h3>
             {annonce.commentaires.length === 0 && (
-              <StudentDate>Aucun commentaire</StudentDate>
+              <p className="student-date">Aucun commentaire</p>
             )}
             {annonce.commentaires.map((comment) => (
-              <Comment key={comment.id}>
-                <CommentImg
+              <div key={comment.id} className="comment">
+                <img
                   src={comment.etudiant_image || '/default.jpg'}
                   alt="profil"
+                  className="comment-img"
                 />
                 <div>
-                  <CommentName>{comment.premon}</CommentName>
-                  <CommentDate>{new Date(comment.date).toLocaleString()}</CommentDate>
-                  <CommentText>{comment.contenu}</CommentText>
+                  <p className="comment-name">{comment.premon}</p>
+                  <p className="comment-date">{new Date(comment.date).toLocaleString()}</p>
+                  <p className="comment-text">{comment.contenu}</p>
                 </div>
-              </Comment>
+              </div>
             ))}
-          </CommentsSection>
-        </Card>
+          </div>
+        </div>
       ))}
-    </PageContainer>
+    </div>
   );
 }
 
 export default Home;
-const PageContainer = styled.div`
-  background-color: #f3f4f6;
-  min-height: 100vh;
-  padding: 1.5rem;
-  font-family: sans-serif;
-`;
-
-const PageTitle = styled.h1`
-  font-size: 1.875rem;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 1.5rem;
-`;
-
-const Card = styled.div`
-  background-color: #fff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  border-radius: 0.5rem;
-  padding: 1rem;
-  margin-bottom: 1.5rem;
-`;
-
-const FlexRow = styled.div`
-  display: flex;
-  align-items: center;
-  margin-bottom: 0.5rem;
-`;
-
-const ProfileImg = styled.img`
-  width: 48px;
-  height: 48px;
-  border-radius: 9999px;
-  margin-right: 1rem;
-  object-fit: cover;
-`;
-
-const StudentName = styled.p`
-  font-weight: 600;
-`;
-
-const StudentDate = styled.p`
-  font-size: 0.875rem;
-  color: #6b7280;
-`;
-
-const AnnonceTitle = styled.h2`
-  font-size: 1.25rem;
-  font-weight: 600;
-`;
-
-const AnnonceContent = styled.p`
-  margin-top: 0.5rem;
-`;
-
-const AnnonceImage = styled.img`
-  margin-top: 1rem;
-  max-height: 24rem;
-  width: 100%;
-  object-fit: cover;
-  border-radius: 0.5rem;
-`;
-
-const CommentsSection = styled.div`
-  margin-top: 1rem;
-  border-top: 1px solid #e5e7eb;
-  padding-top: 0.5rem;
-`;
-
-const Comment = styled.div`
-  display: flex;
-  align-items: start;
-  margin-top: 0.75rem;
-`;
-
-const CommentImg = styled.img`
-  width: 32px;
-  height: 32px;
-  border-radius: 9999px;
-  margin-right: 0.5rem;
-  object-fit: cover;
-`;
-
-const CommentName = styled.p`
-  font-size: 0.875rem;
-  font-weight: 600;
-`;
-
-const CommentDate = styled.p`
-  font-size: 0.75rem;
-  color: #6b7280;
-`;
-
-const CommentText = styled.p`
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
-`;
