@@ -1,63 +1,137 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Link, useNavigate } from 'react-router-dom';    
+import { Link, useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Eye, EyeOff } from 'lucide-react';
+
 import Button from '~/components/ui/Button';
 import Input from '~/components/ui/Input';
 import { Wrapper } from '~/styles/style';
+import { exec } from '~/utils/exec';
+import axiosClient from '~/config/axiosClient';
 
-function SignUp() {
-  const navigate = useNavigate()
-  
-  const submitEmail = () => {
-    navigate('/sign-in')
+const signUpSchema = z.object({
+  firstName: z.string().min(1, "Le prénom est requis"),
+  lastName: z.string().min(1, "Le nom est requis"),
+  email: z.email("Email invalide"),
+  password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères"),
+});
+
+export default function SignUp() {
+  const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting }
+  } = useForm({
+    resolver: zodResolver(signUpSchema),
+  });
+
+  const onSubmit = async (data) => {
+    const res = await exec(
+      () => axiosClient.post('/auth/sign-up', {
+        prenom: data.firstName,
+        nom: data.lastName,
+        email: data.email,
+        motDePasse: data.password,
+      }),
+      setLoading,
+      setError
+    );
+    if (res) {
+      navigate('/sign-in');
+    }
   };
 
   return (
     <Wrapper>
       <Container>
-        <Title>WELCOME !</Title>
-        <TitleH4>Create an account</TitleH4>
-        <Para>Enter your email to sign up for the platform</Para>
+        <Title>BIENVENUE !</Title>
+        <TitleH4>Créer un compte</TitleH4>
+        <Para>Remplissez les champs pour vous inscrire</Para>
 
-        <Row>
-          <Input type='email' id='email' placeholder='Enter your email' />
-          <Input type='password' id='password' placeholder='Enter your password' />
-          <Button onClick={submitEmail}>Continue</Button>
-        </Row>
+        <Form onSubmit={handleSubmit(onSubmit)}>
+          <Row>
+            <InputWrapper>
+              <Input
+                type="text"
+                placeholder="Prénom"
+                {...register('firstName')}
+                $borderRadius="6px"
+                $width="100%"
+              />
+              {errors.firstName && <ErrorText>{errors.firstName.message}</ErrorText>}
+            </InputWrapper>
 
-        <Divider>or</Divider>
+            <InputWrapper>
+              <Input
+                type="text"
+                placeholder="Nom"
+                {...register('lastName')}
+                $borderRadius="6px"
+                $width="100%"
+              />
+              {errors.lastName && <ErrorText>{errors.lastName.message}</ErrorText>}
+            </InputWrapper>
+          </Row>
 
-        <ButtonGroup>
-          <FirstButton>
-            Continue with Google
-          </FirstButton>
+          <Row>
+            <InputWrapperFull>
+              <Input
+                type="email"
+                placeholder="Adresse e-mail"
+                {...register('email')}
+                $borderRadius="6px"
+                $width="100%"
+              />
+              {errors.email && <ErrorText>{errors.email.message}</ErrorText>}
+            </InputWrapperFull>
+          </Row>
 
-          <SecondButton>
-            <Image
-              src='https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg'
-              alt='Apple logo'
-            />
-            Continue with Apple
-          </SecondButton>
-        </ButtonGroup>
+          <Row>
+            <InputWrapperFull style={{ position: 'relative' }}>
+              <Input
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Mot de passe"
+                {...register('password')}
+                $borderRadius="6px"
+                $width="100%"
+                style={{ paddingRight: '40px' }}
+              />
+              <TogglePasswordButton
+                type="button"
+                $hasError={!!errors?.password?.message}
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </TogglePasswordButton>
+              {errors.password && <ErrorText>{errors.password.message}</ErrorText>}
+            </InputWrapperFull>
+          </Row>
 
-        <Other>
-          By clicking continue, you agree to our <span>Terms of Service</span> and{' '}
-          <span>Privacy Policy</span>.
-        </Other>
+          <Button type="submit" $width="100%" disabled={isSubmitting || loading} $borderRadius="6px">
+            {isSubmitting ? "Inscription en cours..." : "S'inscrire"}
+          </Button>
+
+          {error && <ErrorText>{error || 'Une erreur est survenue'}</ErrorText>}
+        </Form>
 
         <HaveAccount>
-          Already have an account?
-          <StyledLink to='/sign-in'>Sign in</StyledLink>
+          Déjà un compte ?
+          <StyledLink to='/sign-in'>Se connecter</StyledLink>
         </HaveAccount>
       </Container>
     </Wrapper>
   );
 }
 
-export default SignUp;
-
-/* ---------- styled components ---------- */
 
 const Container = styled.div`
   background-color: rgba(255, 255, 255, 0.9);
@@ -86,25 +160,54 @@ const Para = styled.p`
   font-size: 14px;
 `;
 
-const Divider = styled.p`
-  color: #333;
-  margin: 14px 0;
-  font-size: 15px;
-  font-style: italic;
+const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+  width: 100%;
 `;
 
-const Other = styled.p`
-  font-size: 15px;
-  color: #555;
-  margin-top: 20px;
-
-  span {
-    color: #007bff;
-    text-decoration: none;
-    margin: 0 4px;
-    cursor: pointer;
-  }
+const Row = styled.div`
+  display: flex;
+  gap: 16px;
+  width: 100%;
+  justify-content: center;
+  flex-wrap: wrap;
 `;
+
+const InputWrapper = styled.div`
+  flex: 1 1 45%;
+  display: flex;
+  flex-direction: column;
+`;
+
+const InputWrapperFull = styled.div`
+  flex: 1 1 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+`;
+
+const TogglePasswordButton = styled.button`
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: ${({ $hasError }) => ($hasError ? 'translateY(-80%)' : 'translateY(-50%)')} ;
+  
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #666;
+`;
+
+const ErrorText = styled.span`
+  color: #d32f2f;
+  font-size: 13px;
+  margin-top: 4px;
+  align-self: flex-start;
+`;
+
 
 const HaveAccount = styled.p`
   font-size: 14px;
@@ -121,41 +224,4 @@ const StyledLink = styled(Link)`
   &:hover {
     text-decoration: underline;
   }
-`;
-
-const Row = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  align-items: center;
-`;
-
-const ButtonGroup = styled.div`
-  margin-left: 20px;
-`;
-
-const FirstButton = styled(Button)`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  background: #fff;
-  color: #000;
-  border: 3px solid #ccc;
-  margin-bottom: 10px;
-`;
-
-const SecondButton = styled(Button)`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  background: #000;
-  color: rgba(255, 255, 255, 0.9);
-  border: 3px solid #ccc;
-`;
-
-const Image = styled.img`
-  width: 21px;
-  height: 16px;
 `;

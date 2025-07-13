@@ -69,10 +69,8 @@ function SignIn() {
   return (
     <Wrapper>
       <Container>
-        <Title>
-          Bienvenue sur <Highlight>Plateforme</Highlight>
-        </Title>
-
+        <Title>BIENVENUE !</Title>
+        <TitleH4>Se connecter</TitleH4>
         <Para>Connectez-vous pour accéder à votre compte</Para>
 
         <Form onSubmit={handleSubmit(onSubmit)}>
@@ -98,7 +96,7 @@ function SignIn() {
             {loading ? 'Chargement...' : 'Se connecter'}
           </Button>
 
-          {error && <ErrorText>{error.message || 'Une erreur est survenue'}</ErrorText>}
+          {error && <ErrorText>{error || 'Une erreur est survenue'}</ErrorText>}
         </Form>
 
         <Divider>ou</Divider>
@@ -132,21 +130,20 @@ const Container = styled.div`
 `;
 
 const Title = styled.h1`
-  font-size: 32px;
-  color: #111;
-  margin-bottom: 12px;
+  font-size: 35px;
+  margin-bottom: 20px;
+  color: #000;
 `;
 
-
-
-const Highlight = styled.span`
-  color: #007bff;
+const TitleH4 = styled.h4`
+  margin: 8px 0;
+  font-size: 18px;
 `;
 
 const Para = styled.p`
-  color: #555;
-  margin-bottom: 24px;
-  font-size: 15px;
+  color: #333;
+  margin-bottom: 20px;
+  font-size: 14px;
 `;
 
 const Form = styled.form`
