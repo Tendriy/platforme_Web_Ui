@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import { MessageSquare } from 'lucide-react';
+import { Wrapper } from '~/styles/style';
 
 const allAnnonces = [
   {
@@ -43,6 +45,8 @@ const allAnnonces = [
 
 function Home() {
   const [annonces, setAnnonces] = useState([]);
+  // état pour garder la visibilité des commentaires par annonce
+  const [visibleComments, setVisibleComments] = useState({});
 
   useEffect(() => {
     setTimeout(() => {
@@ -50,68 +54,101 @@ function Home() {
     }, 300);
   }, []);
 
+  // Toggle affichage commentaires d'une annonce
+  const toggleComments = (id) => {
+    setVisibleComments((prev) => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
+
   return (
-    <PageContainer>
+    <Wrapper $width="80rem" $height="30rem">
       <PageTitle>Fil d'actualité</PageTitle>
 
-      {annonces.map((annonce) => (
-        <Card key={annonce.id}>
-          <FlexRow>
-            <ProfileImg
-              src={annonce.etudiant_image || '/default.jpg'}
-              alt="profil"
-            />
-            <div>
-              <StudentName>{annonce.premon} {annonce.nom}</StudentName>
-              <StudentDate>{new Date(annonce.date_de_publication).toLocaleString()}</StudentDate>
-            </div>
-          </FlexRow>
+      <AnnoncesList>
+        {annonces.map((annonce) => (
+          <Card key={annonce.id}>
+            <FlexRow>
+              <ProfileImg src={annonce.etudiant_image || '/default.jpg'} alt="profil" />
+              <div>
+                <StudentName>{annonce.premon} {annonce.nom}</StudentName>
+                <StudentDate>{new Date(annonce.date_de_publication).toLocaleString()}</StudentDate>
+              </div>
+            </FlexRow>
 
-          <AnnonceTitle>{annonce.titre}</AnnonceTitle>
-          <AnnonceContent>{annonce.contenu}</AnnonceContent>
+            <AnnonceTitle>{annonce.titre}</AnnonceTitle>
+            <AnnonceContent>{annonce.contenu}</AnnonceContent>
 
-          {annonce.image && (
-            <AnnonceImage src={annonce.image} alt="annonce" />
-          )}
-
-          <CommentsSection>
-            <h3>Commentaires</h3>
-            {annonce.commentaires.length === 0 && (
-              <StudentDate>Aucun commentaire</StudentDate>
+            {annonce.image && (
+              <AnnonceImage src={annonce.image} alt="annonce" />
             )}
-            {annonce.commentaires.map((comment) => (
-              <Comment key={comment.id}>
-                <CommentImg
-                  src={comment.etudiant_image || '/default.jpg'}
-                  alt="profil"
-                />
-                <div>
-                  <CommentName>{comment.premon}</CommentName>
-                  <CommentDate>{new Date(comment.date).toLocaleString()}</CommentDate>
-                  <CommentText>{comment.contenu}</CommentText>
-                </div>
-              </Comment>
-            ))}
-          </CommentsSection>
-        </Card>
-      ))}
-    </PageContainer>
+
+            {/* Bouton avec icône commentaire et nombre */}
+            <CommentIconLine>
+              <CommentButton onClick={() => toggleComments(annonce.id)}>
+                <MessageSquare size={18} />
+                <span>{annonce.commentaires.length}</span>
+              </CommentButton>
+            </CommentIconLine>
+
+            {/* Section commentaires visible selon état */}
+            {visibleComments[annonce.id] && (
+              <CommentsSection>
+                <h3>Commentaires</h3>
+                {annonce.commentaires.length === 0 ? (
+                  <StudentDate>Aucun commentaire</StudentDate>
+                ) : (
+                  annonce.commentaires.map((comment) => (
+                    <Comment key={comment.id}>
+                      <CommentImg src={comment.etudiant_image || '/default.jpg'} alt="profil" />
+                      <div>
+                        <CommentName>{comment.premon}</CommentName>
+                        <CommentDate>{new Date(comment.date).toLocaleString()}</CommentDate>
+                        <CommentText>{comment.contenu}</CommentText>
+                      </div>
+                    </Comment>
+                  ))
+                )}
+              </CommentsSection>
+            )}
+          </Card>
+        ))}
+      </AnnoncesList>
+    </Wrapper>
   );
 }
 
 export default Home;
-const PageContainer = styled.div`
-  background-color: #f3f4f6;
-  min-height: 100vh;
-  padding: 1.5rem;
-  font-family: sans-serif;
-`;
+
 
 const PageTitle = styled.h1`
   font-size: 1.875rem;
   font-weight: bold;
   text-align: center;
   margin-bottom: 1.5rem;
+`;
+
+const AnnoncesList = styled.div`
+  max-height: 500px;
+  overflow-y: auto;
+  padding-right: 8px;
+
+  scrollbar-width: thin;
+  scrollbar-color: rgba(100, 100, 100, 0.5) transparent;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(100, 100, 100, 0.5);
+    border-radius: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
 `;
 
 const Card = styled.div`
@@ -160,6 +197,35 @@ const AnnonceImage = styled.img`
   width: 100%;
   object-fit: cover;
   border-radius: 0.5rem;
+`;
+
+const CommentIconLine = styled.div`
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-end;
+`;
+
+const CommentButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: #333;
+  cursor: pointer;
+  font-size: 0.9rem;
+
+  &:hover {
+    color: #1877f2;
+  }
+
+  svg {
+    color: #1877f2;
+  }
+
+  span {
+    font-weight: 500;
+  }
 `;
 
 const CommentsSection = styled.div`
