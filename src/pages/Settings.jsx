@@ -71,7 +71,7 @@ const HelpText = styled.p`
 
 const LogoutButton = styled.button`
   padding: 10px 20px;
-  background-color: crimson;
+  background-color: #000;
   color: white;
   border: none;
   border-radius: 8px;
@@ -79,6 +79,6 @@ const LogoutButton = styled.button`
   cursor: pointer;
 
   &:hover {
-    background-color: darkred;
+    background-color:#007bff;
   }
 `;

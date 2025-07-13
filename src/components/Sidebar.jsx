@@ -56,7 +56,7 @@ const SidebarStyled = styled.aside`
 `;
 
 const LogoSpan = styled.span`
-  color: orange;
+  color: #007bff;
 `
 
 const LogoTitle = styled.h2`
