@@ -1,89 +1,156 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 import Button from '~/components/ui/Button';
 import Input from '~/components/ui/Input';
+import { Wrapper } from '~/styles/style';
+import axiosClient from '~/config/axiosClient';
+import { exec } from '~/utils/exec';
+
+const emailSchema = z.object({
+  email: z.email("Email invalide"),
+});
+
+const otpSchema = z.object({
+  otp: z.string().min(6, "Code OTP requis"),
+});
+
+const passwordSchema = z.object({
+  password: z.string().min(6, "Mot de passe trop court"),
+});
 
 function ForgetPassword() {
   const [step, setStep] = useState(1);
-  const [email, setEmail] = useState('');
-  const [otp, setOtp] = useState('');
-  const [newPassword, setNewPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate()
 
-  const handleEmailSubmit = (e) => {
-    e.preventDefault();
-    alert(`Un code OTP a été envoyé à ${email}`);
-    setStep(2);
-  };
+  const {
+    register: registerEmail,
+    getValues: getValuesEmail,
+    handleSubmit: handleSubmitEmail,
+    formState: { errors: emailErrors, isSubmitting: isSubmittingEmail },
+  } = useForm({ resolver: zodResolver(emailSchema) });
 
-  const handleOtpSubmit = (e) => {
-    e.preventDefault();
-    if (otp === '123456') {
-      setStep(3);
-    } else {
-      alert('Code OTP invalide');
+  const {
+    register: registerOtp,
+    handleSubmit: handleSubmitOtp,
+   formState: { errors: otpErrors, isSubmitting: isSubmittingOtp },
+  } = useForm({ resolver: zodResolver(otpSchema) });
+
+  const {
+    register: registerPassword,
+    handleSubmit: handleSubmitPassword,
+     formState: { errors: passwordErrors, isSubmitting: isSubmittingPassword },
+  } = useForm({ resolver: zodResolver(passwordSchema) });
+
+  const onEmailSubmit = async (data) => {
+    const res = await exec(
+      () => axiosClient.post('/auth/request-reset', { email: data.email }),
+      setLoading,
+      setError
+    );
+    if (res) {
+      setStep(2);
     }
   };
 
-  const handlePasswordSubmit = (e) => {
-    e.preventDefault();
-    alert('Mot de passe réinitialisé avec succès');
-    setStep(1);
-    setEmail('');
-    setOtp('');
-    setNewPassword('');
+  const onOtpSubmit = async (data) => {
+    const res = await exec(
+      () => axiosClient.post('/auth/verify-otp', {
+        email: getValuesEmail('email'),
+        otpCode: data.otp,
+      }),
+      setLoading,
+      setError
+    );
+    if (res) {
+      setStep(3);
+    }
   };
+
+  const onPasswordSubmit = async (data) => {
+    const res = await exec(
+      () => axiosClient.post('/auth/reset-password', {
+        email: getValuesEmail('email'),
+        newPassword: data.password,
+      }),
+      setLoading,
+      setError
+    );
+    if (res) {
+      setStep(1);
+      navigate("/sign-in")
+    }
+  };
+
 
   return (
     <Wrapper>
       <Container>
-        <Title>Récupération <Highlight>mot de passe</Highlight></Title>
+        <Title>BIENVENUE !</Title>
+        <TitleH4>Récupération mot de passe</TitleH4>
 
         {step === 1 && (
           <>
-            <Description>Entrez votre adresse e-mail pour recevoir un code OTP.</Description>
-            <Form onSubmit={handleEmailSubmit}>
-              <StyledInput
+            <Para>Entrez votre adresse e-mail pour recevoir un code OTP.</Para>
+            <Form onSubmit={handleSubmitEmail(onEmailSubmit)}>
+               {error && <Error>{error}</Error>}
+              <Input
                 type="email"
                 placeholder="Adresse e-mail"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                $borderRadius="6px"
+                $width="100%"
+                {...registerEmail('email')}
               />
-              <StyledButton type="submit">Envoyer le code</StyledButton>
+              {emailErrors.email && <Error>{emailErrors.email.message}</Error>}
+              <Button type="submit" disabled={isSubmittingEmail || loading} $borderRadius="6px" $width="100%">
+                 {loading ? 'Envoi...' : 'Envoyer le code'}
+              </Button>
             </Form>
           </>
         )}
 
         {step === 2 && (
           <>
-            <Description>Entrez le code OTP envoyé à votre e-mail.</Description>
-            <Form onSubmit={handleOtpSubmit}>
-              <StyledInput
+            <Para>Entrez le code OTP envoyé à votre e-mail.</Para>
+            <Form onSubmit={handleSubmitOtp(onOtpSubmit)}>
+               {error && <Error>{error}</Error>}
+              <Input
                 type="text"
                 placeholder="Code OTP"
-                required
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
+                $borderRadius="6px"
+                $width="100%"
+                {...registerOtp('otp')}
               />
-              <StyledButton type="submit">Vérifier</StyledButton>
+              {otpErrors.otp && <Error>{otpErrors.otp.message}</Error>}
+              <Button type="submit" disabled={isSubmittingOtp || loading} $borderRadius="6px" $width="100%">
+                 {loading ? 'Vérification...' : 'Vérifier'}
+              </Button>
             </Form>
           </>
         )}
 
         {step === 3 && (
           <>
-            <Description>Définissez un nouveau mot de passe.</Description>
-            <Form onSubmit={handlePasswordSubmit}>
-              <StyledInput
+            <Para>Définissez un nouveau mot de passe.</Para>
+            <Form onSubmit={handleSubmitPassword(onPasswordSubmit)}>
+               {error && <Error>{error}</Error>}
+              <Input
                 type="password"
                 placeholder="Nouveau mot de passe"
-                required
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
+                $borderRadius="6px"
+                $width="100%"
+                {...registerPassword('password')}
               />
-              <StyledButton type="submit">Réinitialiser</StyledButton>
+              {passwordErrors.password && <Error>{passwordErrors.password.message}</Error>}
+              <Button type="submit" disabled={isSubmittingPassword || loading} $borderRadius="6px" $width="100%">
+                  {loading ? 'Réinitialisation...' : 'Réinitialiser'}
+              </Button>
             </Form>
           </>
         )}
@@ -96,59 +163,44 @@ function ForgetPassword() {
   );
 }
 
-// 🔵 Styles
-const Wrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background: #f0f2f5;
-`;
-
 const Container = styled.div`
   background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(12px);
   padding: 40px;
   border-radius: 20px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   max-width: 420px;
   width: 100%;
   text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 `;
 
 const Title = styled.h1`
-  font-size: 30px;
-  color: #111;
-  margin-bottom: 10px;
-`;
-
-const Highlight = styled.span`
-  color: #007bff;
-`;
-
-const Description = styled.p`
-  font-size: 15px;
-  color: #555;
+  font-size: 35px;
   margin-bottom: 20px;
+  color: #000;
+`;
+
+const TitleH4 = styled.h4`
+  margin: 8px 0;
+  font-size: 18px;
+`;
+
+const Para = styled.p`
+  color: #333;
+  margin-bottom: 20px;
+  font-size: 14px;
 `;
 
 const Form = styled.form`
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: 14px;
   width: 100%;
 `;
 
-const StyledInput = styled(Input)`
-  width: 100%;
-`;
-
-const StyledButton = styled(Button)`
-  width: 100%;
+const Error = styled.span`
+  font-size: 13px;
+  color: #d32f2f;
+  text-align: left;
 `;
 
 const BackToLogin = styled.div`
@@ -164,4 +216,5 @@ const StyledLink = styled(Link)`
   }
 `;
 
-export default ForgetPassword;
+
+export default ForgetPassword

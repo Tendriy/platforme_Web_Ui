@@ -25,6 +25,10 @@ const router = createBrowserRouter([
         path: '/auth/google/redirect',
         element: <AuthGoogleRedirect />
     },
+     {
+        path: '/forgot-password',
+        element: <ForgetPasword />
+    },
     {
         path: '/',
         element: <ProtectedRoute />,
