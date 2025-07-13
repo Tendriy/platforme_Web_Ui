@@ -75,7 +75,7 @@ const MenuContainer = styled.div`
 
 const TabButton = styled.button`
   flex: 1;
-  background-color: ${({ active }) => (active ? 'orange' : '#fff')};
+  background-color: ${({ active }) => (active ? '#007bff;' : '#fff')};
   color: ${({ active }) => (active ? '#fff' : '#333')};
   border: none;
   padding: 10px 0;
@@ -95,7 +95,7 @@ const TabButton = styled.button`
 
 const StyledLink = styled(Link)`
   flex: 1;
-  background-color: ${({ $active }) => ($active ? 'orange' : '#fff')};
+  background-color: ${({ $active }) => ($active ? '#007bff;' : '#fff')};
   color: ${({ $active }) => ($active ? '#fff' : '#333')};
   border: none;
   padding: 10px 0;
@@ -110,7 +110,7 @@ const StyledLink = styled(Link)`
   transition: background-color 0.3s ease;
 
   &:hover {
-    background-color: ${({ $active }) => ($active ? 'orange' : '#ddd')};
+    background-color: ${({ $active }) => ($active ? '#007bff;' : '#ddd')};
   }
 `;
 

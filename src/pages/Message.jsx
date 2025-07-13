@@ -90,7 +90,7 @@ const MessageBubble = styled.div`
   border-radius: 15px;
   font-size: 14px;
   align-self: ${({ left }) => (left ? 'flex-start' : 'flex-end')};
-  background-color: ${({ left }) => (left ? '#f0f0f0' : 'orange')};
+  background-color: ${({ left }) => (left ? '#f0f0f0' : '#007bff;')};
   color: ${({ left }) => (left ? '#000' : '#fff')};
 `;
 
