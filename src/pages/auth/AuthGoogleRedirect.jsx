@@ -24,7 +24,7 @@ export default function AuthGoogleRedirect() {
     })
       .then((res) => {
         const user = res.data;
-        login({ accessToken, refreshToken }, user);
+        login({ accessToken, refreshToken }, user?.user);
         navigate('/home');
       })
       .catch(() => {

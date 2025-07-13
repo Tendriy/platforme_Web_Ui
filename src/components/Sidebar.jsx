@@ -1,26 +1,23 @@
 import Avatar from '~/components/Avatar';
-import me from '~/assets/images/me.jpeg'
 import styled from 'styled-components';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import axiosClient from '~/config/axiosClient';
+import me from '~/assets/images/me.jpeg'
+import useAuth from '~/hooks/useAuth';
+import makeFullUrl from '~/utils/makeFullUrl';
 
 function Sidebar() {
   const [annonces, setAnnonces] = useState([])
-  const [id, setId] = useState(9)
-  const fakeEmail = "anissa.gmail.com";
-  const fakeName = "Anissa";
+  const user = useAuth(state => state.user)
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const url = `/annonces/${id}/students`
-        const { data } = await axiosClient.get(url)
-        setAnnonces(data);
-      } catch (error) {
-        console.error(error);
-      }
-    })()
-  }, [id])
+  const userInfo = useMemo(() => {
+    return {
+      image: makeFullUrl(user?.image, user?.isAuthGoogle),
+      email: user?.email.toLowerCase() || '',
+      nom: user?.nom.toLowerCase() || '',
+      prenom: user?.prenom.toLowerCase() || ''
+    };
+  }, [user]);
 
   return (
     <SidebarStyled>
@@ -29,19 +26,25 @@ function Sidebar() {
         <LogoSpan>Student</LogoSpan>
       </LogoTitle>
       <Row>
-        <Avatar
-          src={me}
-          alt='me.jpeg'
-          size={90}
-        />
+        {userInfo.image ? (
+          <Avatar src={userInfo.image} alt="Avatar" size={90} />
+        ) : (
+          <Avatar src={me} alt="Avatar par défaut" size={90} />
+        )}
       </Row>
+
       <ListContainer>
-        <ListItem>{fakeEmail}</ListItem>
-        <ListItem >{fakeName}</ListItem>
+        <ListItem $bold $transform="capitalize">
+          {userInfo.prenom} {userInfo.nom}
+        </ListItem>
+
+        <ListItem $transform="lowercase">
+          {userInfo.email}
+        </ListItem>
       </ListContainer>
-       <pre>
-         {JSON.stringify(annonces, null, 2)}
-       </pre>
+      <pre>
+        {JSON.stringify(annonces, null, 2)}
+      </pre>
     </SidebarStyled>
   )
 }
@@ -82,5 +85,7 @@ const ListItem = styled.li`
   font-family: Arial, Helvetica, sans-serif;
   font-size: 20px;
   margin-bottom: 12px;
+  font-weight: ${(props) => (props.$bold ? 'bold' : 'normal')};
+  text-transform: ${(props) => props.$transform || 'none'};
 
   `

@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 /**
- * @param {Object} props
+ * @param {Object | string} props
  * @param {string} props.src 
  * @param {string} [props.alt] 
  * @param {number} [props.size]
