@@ -2,7 +2,6 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import styled from 'styled-components';
 
-import bg from '~/assets/images/school.jpeg'
 import Tabs from '~/components/Tabs';
 import { Bell, Home, Menu, MessageCircle, Users } from 'lucide-react';
 import Sidebar from '../Sidebar';
@@ -22,16 +21,10 @@ function Layout() {
       <Sidebar />
       <Main>
         <Navbar>
-          <Header>
-            <Text>
-              <Welcome>Welcome to the plateform</Welcome>
-            </Text>
-            <Tabs
-              tabs={tabs}
-              isRouter
-              onChangeTab={index => console.log('Onglet actif:', index)}
-            />
-          </Header>
+          <Tabs
+            tabs={tabs}
+            isRouter
+          />
         </Navbar>
         <Content>
           <Outlet />
@@ -45,52 +38,49 @@ export default Layout;
 
 const PageWrapper = styled.div`
   display: flex;
-  min-height: 100vh;
+  height: 100vh; 
+  overflow: hidden;
   font-family: 'Segoe UI', sans-serif;
 `;
-
-
 
 const Main = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
   background-color: #f4f6f8;
 `;
 
 const Navbar = styled.nav`
-  height: 300px;
+  height: 100px;
   background-color: #fff;
   padding: 20px;
   display: flex;
   align-items: center;
   border-bottom: 1px solid #ddd;
+  flex-shrink: 0;
 `;
 
 const Content = styled.main`
   flex: 1;
-  padding: 30px;
+  overflow-y: auto;
+  padding: 30px 30px 30px 30px;
+  background-color: #fefefe;
+
+  scrollbar-width: thin;
+  scrollbar-color: rgba(100, 100, 100, 0.5) transparent;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(100, 100, 100, 0.5);
+    border-radius: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
 `;
 
-const Header = styled.div`
-  width: 100%;
-  height: 100%;
-`
-const Text = styled.div`
-  text-align: center;
-  height: 220px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-image: url(${bg});
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-`;
-
-const Welcome = styled.h1`
-  text-align: center;
-  font-size: 3rem;
-  font-weight: 600;
-  color: #f7f5f3;
-`
