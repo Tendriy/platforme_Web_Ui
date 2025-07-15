@@ -1,14 +1,15 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+import useAuth from '~/hooks/useAuth';
 
 function Settings() {
   const navigate = useNavigate();
+  const logout = useAuth((state) => state.logout);
 
   const handleLogout = () => {
-    // Simuler la déconnexion
-    localStorage.removeItem('token'); // si tu utilises un token
-    navigate('/sign-in'); // redirige vers page de connexion
+    logout();
+    navigate('/sign-in'); 
   };
 
   return (

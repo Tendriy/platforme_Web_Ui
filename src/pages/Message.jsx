@@ -1,118 +1,114 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import axiosClient from '~/config/axiosClient';
 
 function Message() {
+  const [amis, setAmis] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [erreur, setErreur] = useState(null);
+
+  useEffect(() => {
+    const fetchAmis = async () => {
+      try {
+        const response = await axiosClient.get('/friends/amis');
+        setAmis(response.data);
+      } catch (err) {
+        setErreur("Erreur lors du chargement des amis.");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAmis();
+  }, []);
+
   return (
-    <Wrapper>
-      <ChatContainer>
-        <MessageList>
-          <MessageBubble left>Bienvenue sur la plateforme fa tsy we bienvenu sur plateforme</MessageBubble>
-          <MessageBubble left>Bienvenue sur la plateforme fa tsy we bienvenu sur plateforme</MessageBubble>
-          <MessageBubble right>ok</MessageBubble>
-          <MessageBubble left>Yes</MessageBubble>
-          <MessageBubble right>Encore ?</MessageBubble>
-          <MessageBubble left>Tu es sûr ?</MessageBubble>
-          <MessageBubble right>Oui oui</MessageBubble>
-          <MessageBubble left>Très bien</MessageBubble>
-          <MessageBubble right>C'est noté</MessageBubble>
-          <MessageBubble left>On continue demain ?</MessageBubble>
-          <MessageBubble right>Pas de souci !</MessageBubble>
+    <Container>
+      <Title>💬 Messagerie</Title>
 
-        </MessageList>
+      {loading && <Info>Chargement...</Info>}
+      {erreur && <Erreur>{erreur}</Erreur>}
 
-        <InputZone>
-          <Input placeholder="Aa" />
-          <SendButton>📨</SendButton>
-        </InputZone>
-      </ChatContainer>
-    </Wrapper>
+      <FriendList>
+        {amis.map((ami) => (
+          <Friend key={ami.id}>
+            <Avatar src={ami.image || '/default-avatar.png'} alt={ami.nom} />
+            <FriendInfo>
+              <Name>{ami.prenom} {ami.nom}</Name>
+              <Email>{ami.email}</Email>
+            </FriendInfo>
+          </Friend>
+        ))}
+      </FriendList>
+    </Container>
   );
 }
 
 export default Message;
 
-const Wrapper = styled.div`
-  width: 80vw;
-  height: 50vh;
-  display: flex;
-  justify-content: center;   
-  align-items: center;       
-  background-color: #f5f5f5;
+const Container = styled.div`
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  font-family: 'Arial', sans-serif;
 `;
 
-const ChatContainer = styled.div`
-  width: 350px;
-  height: 500px;
-  border-radius: 10px;
-  border: 3px solid #222020;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  overflow: hidden;
-  font-family: Arial, sans-serif;
-  background-color: #fff; /* pour bien voir l’intérieur */
+const Title = styled.h2`
+  text-align: center;
+  color: #222;
 `;
 
+const Info = styled.p`
+  text-align: center;
+  font-style: italic;
+  color: #888;
+`;
 
+const Erreur = styled.p`
+  text-align: center;
+  color: red;
+`;
 
-const MessageList = styled.div`
-  flex: 1;
-  padding: 10px;
+const FriendList = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
+  margin-top: 20px;
+  max-height: 400px;
   overflow-y: auto;
-  width: 100%;
-
-  /* Personnalisation de la scrollbar pour Chrome / Webkit */
-  &::-webkit-scrollbar {
-    width: 3px; /* largeur de la barre */
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background-color: #888; /* couleur de la barre */
-    border-radius: 4px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  /* Scrollbar fine pour Firefox */
-  scrollbar-width: thin;
-  scrollbar-color: #888 transparent;
 `;
 
-
-const MessageBubble = styled.div`
-  max-width: 70%;
-  padding: 10px;
-  border-radius: 15px;
-  font-size: 14px;
-  align-self: ${({ left }) => (left ? 'flex-start' : 'flex-end')};
-  background-color: ${({ left }) => (left ? '#f0f0f0' : '#007bff;')};
-  color: ${({ left }) => (left ? '#000' : '#fff')};
-`;
-
-const InputZone = styled.div`
+const Friend = styled.div`
   display: flex;
+  align-items: center;
+  background: #f4f4f4;
+  border-radius: 10px;
   padding: 10px;
-  border-top: 1px solid #ddd;
-  background: #fff;
 `;
 
-const Input = styled.input`
-  flex: 1;
-  border: none;
+const Avatar = styled.img`
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 12px;
+`;
+
+const FriendInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const Name = styled.span`
+  font-weight: bold;
+  color: #333;
+`;
+
+const Email = styled.span`
   font-size: 14px;
-  padding: 8px;
-  outline: none;
-`;
-
-const SendButton = styled.button`
-  background: none;
-  border: none;
-  font-size: 18px;
-  cursor: pointer;
-  margin-left: 8px;
+  color: #666;
 `;
